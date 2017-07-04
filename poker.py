@@ -14,17 +14,17 @@ def get_suits_list(lst):
 
 
 def cmp_cards(card):
-    return RANKS[1:].index(card[:-1])
+    return RANKS[1:].index(card[:-1])   # cmp ranks for sorting
 
 
 def find_ngrams(input_list, n):
-    ngrams = zip(*[input_list[i:] for i in range(n)])
+    ngrams = zip(*[input_list[i:] for i in range(n)])   # n-grams(5) in str combs for straight order
     return ["".join(tpl) for tpl in ngrams]  # to str
 
 
 def chunk(lst, size):
     for i in range(0, len(lst), size):
-        yield lst[i:i + size]
+        yield lst[i:i + size]   # split input onto deals of 10 cards
 
 
 def check_straight_flush(deal):
@@ -32,22 +32,22 @@ def check_straight_flush(deal):
     suitable = list()
 
     for suit in set(suits):
-        if suits.count(suit) > 4:
+        if suits.count(suit) > 4: # all suits, that have 4 cards in deal
             suitable.append(suit)
 
     for suit in suitable:
-        wanted_cards = sorted([card for card in deal if card[1:] == suit], key=cmp_cards)
-        ranks_str = "".join(get_ranks_list(wanted_cards))
+        wanted_cards = sorted([card for card in deal if card[1:] == suit], key=cmp_cards)  # cards, that might be in comb
+        ranks_str = "".join(get_ranks_list(wanted_cards))   # their ranks
         for ngram in find_ngrams(ranks_str, 5):
-            if ngram in RANKS * 2:
+            if ngram in RANKS * 2:      # check for straightness
                 ngram_cards = {card for card in wanted_cards if card[0] in ngram}
-                deck_wanted = ngram_cards & set(deal[5:])
-                hand_excess = (ngram_cards ^ set(deal[:5])) - deck_wanted
+                deck_wanted = ngram_cards & set(deal[5:])   # intersection for wanted cards in deck
+                hand_excess = (ngram_cards ^ set(deal[:5])) - deck_wanted   # count of cards, that might be changed
                 if len(deck_wanted) > len(hand_excess):
                     return False
                 else:
                     for card in deck_wanted:
-                        if deal[5:].index(card) >= len(hand_excess):
+                        if deal[5:].index(card) >= len(hand_excess):  # check if cards are reachable
                             return False
                 return True
     return False
@@ -189,7 +189,7 @@ if __name__ == '__main__':
     deals = list(chunk(input_cards_list, 10))
     comb_funcs = [check_straight_flush, check_four, check_full_house, check_flush,
                   check_straight, check_three, check_two_pairs, check_pair]
-    fmt = "Hand: {hand}, Deck: {deck}\t||\t Best hand: {comb}"
+    fmt = "Hand: {hand}, Deck: {deck}\t||\tBest hand: {comb}"
     for dl in deals:
         for func in comb_funcs:
             if func(dl):
